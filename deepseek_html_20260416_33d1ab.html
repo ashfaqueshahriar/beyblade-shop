@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Metal Fury BeyShop | Dark/Light + Animations</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', 'Orbitron', 'Poppins', sans-serif;
+      transition: background-color 0.3s ease, color 0.2s ease, border-color 0.2s ease;
+    }
+
+    /* ===== DARK MODE (DEFAULT) ===== */
+    :root {
+      --bg-primary: radial-gradient(circle at 20% 30%, #0a0505, #130a0a);
+      --bg-secondary: #1a1208;
+      --bg-card: linear-gradient(145deg, #1e1a14, #14100b);
+      --text-primary: #f0e6d0;
+      --text-secondary: #ffcc88;
+      --accent: #ff6600;
+      --accent-glow: rgba(255, 102, 0, 0.3);
+      --border: #ff884d;
+      --header-bg: rgba(0, 0, 0, 0.85);
+      --admin-bg: #0f0c08ee;
+      --modal-bg: #1d1710;
+      --btn-hover: #ffaa33;
+      --shadow: 0 8px 18px rgba(0,0,0,0.6);
+    }
+
+    /* ===== LIGHT MODE ===== */
+    body.light-mode {
+      --bg-primary: linear-gradient(135deg, #f5f0e8, #e8e0d0);
+      --bg-secondary: #d4c9b8;
+      --bg-card: linear-gradient(145deg, #ffffff, #f0ebe0);
+      --text-primary: #2a2418;
+      --text-secondary: #cc5500;
+      --accent: #ff6600;
+      --accent-glow: rgba(255, 102, 0, 0.15);
+      --border: #cc8844;
+      --header-bg: rgba(245, 240, 230, 0.95);
+      --admin-bg: #f5f0e8ee;
+      --modal-bg: #fff8f0;
+      --btn-hover: #ff8844;
+      --shadow: 0 8px 18px rgba(0,0,0,0.1);
+    }
+
+    body {
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      padding-bottom: 60px;
+      overflow-x: hidden;
+      min-height: 100vh;
+    }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: var(--bg-secondary); border-radius: 10px; }
+    ::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 10px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--btn-hover); }
+
+    /* ===== ANIMATIONS ===== */
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(40px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeInDown {
+      from { opacity: 0; transform: translateY(-40px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeInLeft {
+      from { opacity: 0; transform: translateX(-40px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+    @keyframes fadeInRight {
+      from { opacity: 0; transform: translateX(40px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+    @keyframes bounce {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.15); }
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.6; }
+    }
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+    @keyframes shimmer {
+      0% { background-position: -1000px 0; }
+      100% { background-position: 1000px 0; }
+    }
+    @keyframes glowPulse {
+      0% { box-shadow: 0 0 0 0 var(--accent); }
+      70% { box-shadow: 0 0 0 15px transparent; }
+      100% { box-shadow: 0 0 0 0 transparent; }
+    }
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-8px); }
+    }
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-5px); }
+      75% { transform: translateX(5px); }
+    }
+    @keyframes ripple {
+      to { transform: scale(4); opacity: 0; }
+    }
+    @keyframes slideDown {
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .animate-fade-up { animation: fadeInUp 0.6s cubic-bezier(0.2, 0.9, 0.4, 1.1) forwards; }
+    .animate-fade-down { animation: fadeInDown 0.5s ease-out forwards; }
+    .animate-fade-left { animation: fadeInLeft 0.5s ease-out forwards; }
+    .animate-fade-right { animation: fadeInRight 0.5s ease-out forwards; }
+    .animate-bounce { animation: bounce 0.4s ease-in-out; }
+    .animate-spin { animation: spin 0.6s ease-in-out; }
+    .animate-float { animation: float 3s ease-in-out infinite; }
+    .animate-shake { animation: shake 0.3s ease-in-out; }
+
+    /* Loading Skeleton */
+    .skeleton {
+      background: linear-gradient(90deg, var(--bg-secondary) 25%, var(--border) 50%, var(--bg-secondary) 75%);
+      background-size: 1000px 100%;
+      animation: shimmer 1.5s infinite;
+      border-radius: 20px;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    /* Header */
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      background: var(--header-bg);
+      backdrop-filter: blur(12px);
+      border-bottom: 3px solid var(--accent);
+      padding: 15px 30px;
+      border-radius: 0 0 40px 40px;
+      box-shadow: 0 10px 25px var(--accent-glow);
+      margin-bottom: 30px;
+      animation: fadeInDown 0.6s ease-out;
+    }
+
+    .logo h1 {
+      font-size: 1.8rem;
+      letter-spacing: 3px;
+      background: linear-gradient(135deg, #ffcc44, var(--accent));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .logo p {
+      font-size: 0.7rem;
+      color: var(--text-secondary);
+    }
+
+    /* Theme Toggle */
+    .theme-toggle {
+      background: var(--bg-secondary);
+      border: 1px solid var(--accent);
+      border-radius: 50px;
+      padding: 8px 15px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: all 0.3s ease;
+      margin-right: 10px;
+    }
+    .theme-toggle:hover {
+      transform: scale(1.05);
+      background: var(--accent);
+      color: black;
+    }
+
+    .user-info {
+      display: flex;
+      gap: 15px;
+      align-items: center;
+    }
+
+    .cart-icon, .login-btn {
+      background: var(--bg-secondary);
+      padding: 8px 18px;
+      border-radius: 50px;
+      border: 1px solid var(--accent);
+      cursor: pointer;
+      font-weight: bold;
+      transition: all 0.2s ease;
+    }
+    .cart-icon:hover, .login-btn:hover {
+      background: var(--accent);
+      color: black;
+      transform: scale(1.05);
+      box-shadow: 0 0 15px var(--accent);
+    }
+
+    /* Admin Panel */
+    .admin-toggle {
+      text-align: center;
+      margin: 20px 0;
+    }
+    .admin-btn {
+      background: var(--bg-secondary);
+      border: 1px solid var(--accent);
+      color: var(--text-secondary);
+      padding: 10px 30px;
+      border-radius: 40px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    .admin-btn:hover {
+      background: var(--accent);
+      color: black;
+      transform: scale(1.02);
+      box-shadow: 0 0 20px var(--accent);
+    }
+
+    .admin-panel {
+      background: var(--admin-bg);
+      backdrop-filter: blur(10px);
+      border: 2px solid var(--accent);
+      border-radius: 30px;
+      padding: 20px;
+      margin-bottom: 40px;
+      display: none;
+      animation: slideDown 0.4s ease-out;
+    }
+    .admin-panel.show {
+      display: block;
+    }
+
+    .admin-section {
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 15px;
+      margin: 15px 0;
+      transition: all 0.3s ease;
+    }
+    .admin-section:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 20px var(--accent-glow);
+    }
+
+    .admin-form {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 25px;
+      align-items: center;
+    }
+    .admin-form input, .admin-form select, .admin-form button {
+      padding: 10px 16px;
+      border-radius: 40px;
+      border: none;
+      background: var(--bg-secondary);
+      color: var(--text-primary);
+      transition: all 0.2s ease;
+    }
+    .admin-form input:focus, .admin-form select:focus {
+      outline: none;
+      box-shadow: 0 0 0 2px var(--accent);
+      transform: scale(1.02);
+    }
+    .admin-form button {
+      background: var(--accent);
+      color: black;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    .admin-form button:hover {
+      transform: scale(1.02);
+      filter: brightness(1.1);
+    }
+
+    /* Product Grid */
+    .product-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 25px;
+      margin-top: 30px;
+    }
+
+    .product-card {
+      background: var(--bg-card);
+      border-radius: 28px;
+      padding: 18px;
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+      transition: all 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+      opacity: 0;
+      transform: translateY(30px);
+      animation: fadeInUp 0.5s ease-out forwards;
+    }
+    .product-card:hover {
+      transform: translateY(-8px) scale(1.02);
+      border-color: var(--btn-hover);
+      box-shadow: 0 0 30px var(--accent-glow);
+    }
+
+    .product-img {
+      font-size: 3.5rem;
+      text-align: center;
+      background: rgba(0,0,0,0.3);
+      border-radius: 50px;
+      margin-bottom: 12px;
+      transition: transform 0.3s ease;
+    }
+    .product-card:hover .product-img {
+      transform: scale(1.1) rotate(5deg);
+    }
+
+    .product-name {
+      font-size: 1.3rem;
+      font-weight: bold;
+      color: var(--text-secondary);
+    }
+    .product-price {
+      font-size: 1.6rem;
+      font-weight: bold;
+      color: var(--accent);
+      margin: 10px 0;
+    }
+    .btn-group {
+      display: flex;
+      gap: 12px;
+      margin-top: 12px;
+      flex-wrap: wrap;
+    }
+    .btn-buy, .admin-edit, .admin-delete {
+      padding: 8px 16px;
+      border-radius: 40px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      border: none;
+    }
+    .btn-buy {
+      background: var(--accent);
+      color: black;
+    }
+    .btn-buy:hover {
+      transform: scale(1.05);
+      filter: brightness(1.1);
+      box-shadow: 0 0 12px var(--accent);
+    }
+    .admin-edit {
+      background: var(--bg-secondary);
+      color: var(--text-secondary);
+      border: 1px solid var(--accent);
+    }
+    .admin-delete {
+      background: #8b3a3a;
+      color: #ffccaa;
+    }
+    .admin-edit:hover, .admin-delete:hover {
+      transform: scale(1.02);
+    }
+
+    /* Modal Styles */
+    .modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.95);
+      backdrop-filter: blur(8px);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      visibility: hidden;
+      opacity: 0;
+      transition: all 0.3s ease;
+    }
+    .modal.show {
+      visibility: visible;
+      opacity: 1;
+    }
+    .modal-content {
+      background: var(--modal-bg);
+      max-width: 500px;
+      width: 90%;
+      border-radius: 40px;
+      padding: 25px;
+      border: 2px solid var(--accent);
+      transform: scale(0.9);
+      transition: transform 0.3s ease;
+    }
+    .modal.show .modal-content {
+      transform: scale(1);
+    }
+
+    .payment-option {
+      background: var(--bg-secondary);
+      padding: 15px;
+      margin: 10px 0;
+      border-radius: 20px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    .payment-option:hover {
+      background: var(--accent);
+      color: black;
+      transform: translateX(10px);
+    }
+
+    /* Toast Notification */
+    .toast {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      background: var(--accent);
+      color: black;
+      padding: 12px 24px;
+      border-radius: 50px;
+      font-weight: bold;
+      z-index: 1100;
+      animation: slideUp 0.3s ease-out, fadeIn 0.3s ease-out;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+    }
+    .toast.fade-out {
+      animation: fadeOut 0.3s ease-out forwards;
+    }
+    @keyframes fadeOut {
+      to { opacity: 0; transform: translateY(20px); }
+    }
+
+    footer {
+      text-align: center;
+      margin-top: 50px;
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+    }
+
+    @media (max-width: 650px) {
+      .header { flex-direction: column; gap: 12px; }
+      .admin-form { flex-direction: column; align-items: stretch; }
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <div class="logo animate-float">
+      <h1>⚡ METAL FURY BEYSHOP ⚡</h1>
+      <p>Takara Tomy | Hasbro | Launchers | Stadiums</p>
+    </div>
+    <div class="user-info">
+      <button class="theme-toggle" id="themeToggle">🌓 Dark/Light</button>
+      <span id="userNameDisplay">👤 Guest</span>
+      <div class="cart-icon" id="cartIcon">🛒 (<span id="cartCount">0</span>)</div>
+      <div class="login-btn" id="loginBtn">Login</div>
+    </div>
+  </div>
+
+  <div class="admin-toggle" id="adminToggleContainer" style="display:none;">
+    <button class="admin-btn" id="adminToggleBtn">🔥 ADMIN PANEL 🔥</button>
+  </div>
+
+  <!-- ADMIN PANEL -->
+  <div id="adminPanel" class="admin-panel">
+    <h2>⚙️ MASTER CONTROL ⚙️</h2>
+    <div class="admin-section">
+      <h3>➕ Add New Product</h3>
+      <div class="admin-form">
+        <input type="text" id="prodName" placeholder="Product Name">
+        <select id="prodCategory">
+          <option value="Beyblade">Beyblade</option>
+          <option value="Launcher">Launcher</option>
+          <option value="Stadium">Stadium</option>
+        </select>
+        <select id="prodBrand">
+          <option value="Takara Tomy">Takara Tomy</option>
+          <option value="Hasbro">Hasbro</option>
+        </select>
+        <input type="number" id="prodPrice" placeholder="Price (BDT)">
+        <input type="number" id="prodStock" placeholder="Stock">
+        <button id="addProductBtn">⚡ ADD ITEM</button>
+      </div>
+    </div>
+    <div class="admin-section">
+      <h3>👥 Manage Admin Access</h3>
+      <div class="admin-form">
+        <input type="text" id="newAdminName" placeholder="Admin Name">
+        <input type="password" id="newAdminPass" placeholder="Password">
+        <button id="addAdminBtn">➕ Grant Admin Access</button>
+      </div>
+      <h4>Current Admins:</h4>
+      <ul id="adminList" class="admin-list"></ul>
+      <p style="font-size:0.7rem;">⚠️ Default master admin: "master" / "metal123"</p>
+    </div>
+  </div>
+
+  <!-- PRODUCTS GRID -->
+  <div id="productsGrid" class="product-grid">
+    <div class="skeleton" style="height: 350px;"></div>
+    <div class="skeleton" style="height: 350px;"></div>
+    <div class="skeleton" style="height: 350px;"></div>
+  </div>
+</div>
+
+<!-- Login Modal -->
+<div id="loginModal" class="modal">
+  <div class="modal-content">
+    <h2>🔐 BEYBLADE MASTER LOGIN</h2>
+    <input type="text" id="loginUsername" placeholder="Username" style="width:100%; padding:12px; margin:10px 0; border-radius:40px;">
+    <input type="password" id="loginPassword" placeholder="Password" style="width:100%; padding:12px; margin:10px 0; border-radius:40px;">
+    <button id="doLoginBtn" style="background:#ff6600; padding:12px; width:100%; border-radius:40px; font-weight:bold;">Login</button>
+    <button id="closeLoginBtn" style="margin-top:10px; padding:10px;">Close</button>
+  </div>
+</div>
+
+<!-- Cart Modal -->
+<div id="cartModal" class="modal">
+  <div class="modal-content">
+    <h2>🌀 YOUR BEY CART 🌀</h2>
+    <div id="cartItemsList" style="max-height:300px; overflow-y:auto; margin:15px 0;"></div>
+    <div><strong>Total: ৳<span id="cartTotal">0</span></strong></div>
+    <button id="proceedPaymentBtn" style="background:#ffaa22; width:100%; margin:15px 0; padding:12px; border-radius:40px; font-weight:bold;">💳 PROCEED TO PAYMENT</button>
+    <button id="closeCartBtn" style="padding:10px;">Close</button>
+  </div>
+</div>
+
+<!-- Payment Modal -->
+<div id="paymentModal" class="modal">
+  <div class="modal-content">
+    <h2>💸 SELECT PAYMENT METHOD</h2>
+    <div id="paymentOptions">
+      <div class="payment-option" data-method="bkash">📱 bKash - Mobile Banking</div>
+      <div class="payment-option" data-method="nagad">📱 Nagad - Mobile Banking</div>
+    </div>
+    <div id="paymentDetails" style="margin-top:20px;"></div>
+    <button id="closePaymentBtn" style="margin-top:15px; padding:10px;">Cancel</button>
+  </div>
+</div>
+
+<footer>⚡ Master Admin: master / metal123 | Smooth animations + Dark/Light mode ⚡</footer>
+
+<script>
+  // ===== DATA =====
+  let products = [];
+  let cart = [];
+  let currentUser = null;
+  let adminAccounts = { "master": { password: "metal123", name: "Master Admin" } };
+  let pendingOrderTotal = 0;
+
+  // ===== THEME MANAGEMENT =====
+  function initTheme() {
+    const savedTheme = localStorage.getItem('beyblade_theme');
+    if (savedTheme === 'light') {
+      document.body.classList.add('light-mode');
+    }
+  }
+  function toggleTheme() {
+    document.body.classList.toggle('light-mode');
+    const isLight = document.body.classList.contains('light-mode');
+    localStorage.setItem('beyblade_theme', isLight ? 'light' : 'dark');
+    showToast(isLight ? '☀️ Light Mode Activated' : '🌙 Dark Mode Activated');
+  }
+
+  // ===== TOAST NOTIFICATION =====
+  function showToast(message, duration = 2000) {
+    const existingToast = document.querySelector('.toast');
+    if (existingToast) existingToast.remove();
+    const toast = document.createElement('div');
+    toast.className = 'toast';
+    toast.textContent = message;
+    document.body.appendChild(toast);
+    setTimeout(() => {
+      toast.classList.add('fade-out');
+      setTimeout(() => toast.remove(), 300);
+    }, duration);
+  }
+
+  // ===== LOAD/SAVE =====
+  function loadData() {
+    const storedProducts = localStorage.getItem("beyblade_products");
+    if (storedProducts) products = JSON.parse(storedProducts);
+    else { products = getDefaultProducts(); saveProducts(); }
+    const storedAdmins = localStorage.getItem("beyblade_admins");
+    if (storedAdmins) Object.assign(adminAccounts, JSON.parse(storedAdmins));
+    const storedCart = localStorage.getItem("beyblade_cart");
+    cart = storedCart ? JSON.parse(storedCart) : [];
+    const storedUser = localStorage.getItem("beyblade_current_user");
+    if (storedUser) currentUser = JSON.parse(storedUser);
+    updateUIForUser();
+    updateCartBadge();
+  }
+
+  function getDefaultProducts() {
+    return [
+      { id: "p1", name: "Lightning L-Drago", category: "Beyblade", brand: "Takara Tomy", price: 850, stock: 7, imgIcon: "🌀" },
+      { id: "p2", name: "Pegasus Galaxy", category: "Beyblade", brand: "Hasbro", price: 720, stock: 5, imgIcon: "✨" },
+      { id: "p3", name: "Phantom Orion", category: "Beyblade", brand: "Takara Tomy", price: 990, stock: 3, imgIcon: "🌌" },
+      { id: "p4", name: "String Launcher LR", category: "Launcher", brand: "Takara Tomy", price: 550, stock: 12, imgIcon: "🔌" },
+      { id: "p5", name: "Standard Beystadium", category: "Stadium", brand: "Takara Tomy", price: 1450, stock: 2, imgIcon: "🏟️" },
+      { id: "p6", name: "Hades Kerbecs", category: "Beyblade", brand: "Hasbro", price: 890, stock: 4, imgIcon: "💀" },
+    ];
+  }
+
+  function saveProducts() { localStorage.setItem("beyblade_products", JSON.stringify(products)); }
+  function saveAdmins() { const toSave = {}; for(let k in adminAccounts) if(k !== "master") toSave[k] = adminAccounts[k]; localStorage.setItem("beyblade_admins", JSON.stringify(toSave)); }
+  function saveCart() { localStorage.setItem("beyblade_cart", JSON.stringify(cart)); updateCartBadge(); }
+  function saveCurrentUser() { if(currentUser) localStorage.setItem("beyblade_current_user", JSON.stringify(currentUser)); else localStorage.removeItem("beyblade_current_user"); }
+  function updateCartBadge() { document.getElementById("cartCount").innerText = cart.reduce((s,i) => s + i.quantity, 0); }
+
+  // ===== AUTH UI =====
+  function updateUIForUser() {
+    const isAdmin = currentUser && adminAccounts[currentUser.username];
+    document.getElementById("userNameDisplay").innerHTML = currentUser ? (isAdmin ? `👑 ${currentUser.username}` : `👤 ${currentUser.username}`) : "👤 Guest";
+    document.getElementById("adminToggleContainer").style.display = isAdmin ? "block" : "none";
+    document.getElementById("adminPanel").classList.remove("show");
+    renderProducts();
+  }
+
+  function login(username, password) {
+    if (adminAccounts[username] && adminAccounts[username].password === password) {
+      currentUser = { username: username, isAdmin: true };
+      saveCurrentUser();
+      updateUIForUser();
+      closeLoginModal();
+      showToast(`Welcome ${username}! 🔥 Admin access granted`);
+      return true;
+    }
+    showToast("❌ Invalid credentials! Use master / metal123");
+    return false;
+  }
+
+  // ===== ADMIN FUNCTIONS =====
+  function addAdmin(username, password) {
+    if (!currentUser || currentUser.username !== "master") { showToast("Only Master Admin can add admins!"); return false; }
+    if (adminAccounts[username]) { showToast("Admin already exists!"); return false; }
+    adminAccounts[username] = { password: password, name: username };
+    saveAdmins();
+    renderAdminList();
+    showToast(`✅ Admin ${username} added!`);
+    return true;
+  }
+
+  function removeAdmin(username) {
+    if (!currentUser || currentUser.username !== "master") { showToast("Only Master Admin can remove admins!"); return false; }
+    if (username === "master") { showToast("Cannot remove master admin!"); return false; }
+    delete adminAccounts[username];
+    saveAdmins();
+    renderAdminList();
+    showToast(`🗑️ Admin ${username} removed`);
+    return true;
+  }
+
+  function renderAdminList() {
+    const listEl = document.getElementById("adminList");
+    if (!listEl) return;
+    listEl.innerHTML = Object.keys(adminAccounts).map(u => `<li style="display:flex; justify-content:space-between; padding:8px;">${u} ${u === "master" ? "(MASTER)" : ""} ${u !== "master" ? `<button class="remove-admin" data-user="${u}" style="background:#8b3a3a; padding:2px 12px; border-radius:20px;">Remove</button>` : ""}</li>`).join('');
+    document.querySelectorAll(".remove-admin").forEach(btn => btn.addEventListener("click", () => removeAdmin(btn.getAttribute("data-user"))));
+  }
+
+  // ===== PRODUCT MANAGEMENT =====
+  function renderProducts() {
+    const grid = document.getElementById("productsGrid");
+    const isAdmin = currentUser && adminAccounts[currentUser.username];
+    if (!products.length) { grid.innerHTML = "<div style='text-align:center; padding:50px;'>No products. Add in admin panel!</div>"; return; }
+    grid.innerHTML = products.map((prod, idx) => `
+      <div class="product-card" style="animation-delay: ${idx * 0.05}s" data-id="${prod.id}">
+        <div class="product-img animate-float">${prod.imgIcon || "⚙️"}</div>
+        <div class="product-name">${prod.name}</div>
+        <div><span class="product-brand">${prod.brand}</span> | ${prod.category}</div>
+        <div class="product-price">৳ ${prod.price}</div>
+        <div class="product-stock">📦 Stock: ${prod.stock}</div>
+        <div class="btn-group">
+          <button class="btn-buy" data-id="${prod.id}" ${prod.stock <= 0 ? "disabled style='opacity:0.5;'" : ""}>➕ Add to Cart</button>
+          ${isAdmin ? `<button class="admin-edit" data-id="${prod.id}">✏️ Edit</button><button class="admin-delete" data-id="${prod.id}">🗑️ Delete</button>` : ''}
+        </div>
+      </div>
+    `).join('');
+    document.querySelectorAll(".btn-buy").forEach(btn => btn.addEventListener("click", (e) => addToCart(btn.getAttribute("data-id"))));
+    if (isAdmin) {
+      document.querySelectorAll(".admin-edit").forEach(btn => btn.addEventListener("click", (e) => editProduct(btn.getAttribute("data-id"))));
+      document.querySelectorAll(".admin-delete").forEach(btn => btn.addEventListener("click", (e) => deleteProduct(btn.getAttribute("data-id"))));
+    }
+  }
+
+  function addToCart(productId) {
+    if (!currentUser) { showToast("Please login first!"); return; }
+    const product = products.find(p => p.id === productId);
+    if (!product || product.stock <= 0) { showToast("Out of stock!"); return; }
+    const existing = cart.find(item => item.id === productId);
+    if (existing) {
+      if (existing.quantity + 1 > product.stock) { showToast(`Only ${product.stock} left!`); return; }
+      existing.quantity++;
+    } else cart.push({ id: productId, quantity: 1 });
+    saveCart();
+    renderProducts();
+    const btn = document.querySelector(`.btn-buy[data-id="${productId}"]`);
+    if (btn) btn.classList.add('animate-bounce');
+    showToast(`✨ ${product.name} added to cart!`);
+    setTimeout(() => btn?.classList.remove('animate-bounce'), 400);
+  }
+
+  function editProduct(id) {
+    const prod = products.find(p => p.id === id);
+    if (!prod) return;
+    let newPrice = prompt("New price (BDT):", prod.price);
+    let newStock = prompt("New stock:", prod.stock);
+    if (newPrice && !isNaN(newPrice)) prod.price = parseFloat(newPrice);
+    if (newStock && !isNaN(newStock)) prod.stock = parseInt(newStock);
+    saveProducts();
+    renderProducts();
+    showToast(`✅ ${prod.name} updated!`);
+  }
+
+  function deleteProduct(id) {
+    if (confirm("Delete this product?")) {
+      products = products.filter(p => p.id !== id);
+      cart = cart.filter(c => c.id !== id);
+      saveProducts();
+      saveCart();
+      renderProducts();
+      showToast("🗑️ Product deleted");
+    }
+  }
+
+  function addProduct() {
+    const name = document.getElementById("prodName").value;
+    const category = document.getElementById("prodCategory").value;
+    const brand = document.getElementById("prodBrand").value;
+    const price = parseFloat(document.getElementById("prodPrice").value);
+    const stock = parseInt(document.getElementById("prodStock").value);
+    if (!name || isNaN(price) || isNaN(stock)) { showToast("Fill all fields!"); return; }
+    const newId = "id_" + Date.now();
+    const imgIcon = category === "Beyblade" ? "⚙️" : (category === "Launcher" ? "🔌" : "🏟️");
+    products.push({ id: newId, name, category, brand, price, stock, imgIcon });
+    saveProducts();
+    renderProducts();
+    document.getElementById("prodName").value = "";
+    document.getElementById("prodPrice").value = "";
+    document.getElementById("prodStock").value = "";
+    showToast(`✅ ${name} added!`);
+  }
+
+  // ===== PAYMENT =====
+  function calculateTotal() { return cart.reduce((sum, item) => sum + (products.find(p => p.id === item.id)?.price * item.quantity || 0), 0); }
+  function showPaymentModal() { if (!cart.length) { showToast("Cart is empty!"); return; } pendingOrderTotal = calculateTotal(); document.getElementById("paymentModal").classList.add("show"); document.getElementById("paymentDetails").innerHTML = ""; }
+  function processPayment(method) {
+    const total = pendingOrderTotal;
+    document.getElementById("paymentDetails").innerHTML = `<h3>${method === 'bkash' ? 'bKash' : 'Nagad'} Payment</h3><p>Amount: ৳${total}</p><p>Send to: <strong>${method === 'bkash' ? '017XXXXXXXX' : '018XXXXXXXX'}</strong></p><input type="text" id="trxId" placeholder="Transaction ID" style="width:100%; padding:10px; margin:10px 0; border-radius:40px;"><button id="verifyBtn" style="background:#ff6600; width:100%; padding:10px; border-radius:40px;">Verify Payment</button>`;
+    document.getElementById("verifyBtn").addEventListener("click", () => { const trx = document.getElementById("trxId")?.value; if (trx && trx.length > 3) completeOrder(method, trx); else showToast("Enter valid transaction ID"); });
+  }
+  function completeOrder(method, trxId) {
+    for (let item of cart) { const prod = products.find(p => p.id === item.id); if (prod) prod.stock -= item.quantity; }
+    saveProducts();
+    showToast(`✅ Order placed! Payment: ${method.toUpperCase()}\nTRX: ${trxId}\nTotal: ৳${pendingOrderTotal}`);
+    cart = [];
+    saveCart();
+    closePayment
